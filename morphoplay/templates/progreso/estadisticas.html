@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Estadísticas - MorphoPlay{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2>📈 Estadísticas Completas</h2>
+        <p class="text-secondary">Análisis detallado de tu rendimiento</p>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body text-center">
+                <h3>{{ stats.juegos_completados }}</h3>
+                <p class="text-secondary mb-0">🎯 Juegos Completados</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body text-center">
+                <h3>{{ stats.puntuacion_total }}</h3>
+                <p class="text-secondary mb-0">⭐ Puntuación Total</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body text-center">
+                <h3>🔥 {{ stats.racha_actual }}</h3>
+                <p class="text-secondary mb-0">Racha Actual</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body text-center">
+                <h3>🏆 {{ mejor_racha }}</h3>
+                <p class="text-secondary mb-0">Mejor Racha</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body text-center">
+                <h3>{{ porcentaje_aciertos }}%</h3>
+                <p class="text-secondary mb-0">🎯 Porcentaje de Aciertos</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body text-center">
+                <h3>{{ tiempo_promedio }}s</h3>
+                <p class="text-secondary mb-0">⏱ Tiempo Promedio</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body text-center">
+                <h3>{{ dias_activos }}</h3>
+                <p class="text-secondary mb-0">📅 Días Activos</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Partidas por mes -->
+{% if partidas_por_mes %}
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0">📊 Partidas por Mes</h5>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Mes</th>
+                        <th>Total Partidas</th>
+                        <th>Correctas</th>
+                        <th>Porcentaje</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for mes in partidas_por_mes %}
+                    <tr>
+                        <td>{{ mes.mes }}</td>
+                        <td>{{ mes.total }}</td>
+                        <td>{{ mes.correctas }}</td>
+                        <td>
+                            {% widthratio mes.correctas mes.total 100 %}%
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

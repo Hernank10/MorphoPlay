@@ -1,0 +1,98 @@
+[
+  {
+    "model": "auth.user",
+    "pk": 1001,
+    "fields": {
+      "username": "demo_user",
+      "password": "pbkdf2_sha256$260000$YHr4Z4t3dL92JwB5$vfB0Spx3Jaq8VkB1u2Xw==",
+      "email": "demo@morphoplay.com",
+      "first_name": "Demo",
+      "last_name": "User",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "last_login": null
+    }
+  },
+  {
+    "model": "auth.user",
+    "pk": 1002,
+    "fields": {
+      "username": "alumno1",
+      "password": "pbkdf2_sha256$260000$YHr4Z4t3dL92JwB5$vfB0Spx3Jaq8VkB1u2Xw==",
+      "email": "alumno1@test.com",
+      "first_name": "Alumno",
+      "last_name": "Uno",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "last_login": null
+    }
+  },
+  {
+    "model": "auth.user",
+    "pk": 1003,
+    "fields": {
+      "username": "alumno2",
+      "password": "pbkdf2_sha256$260000$YHr4Z4t3dL92JwB5$vfB0Spx3Jaq8VkB1u2Xw==",
+      "email": "alumno2@test.com",
+      "first_name": "Alumno",
+      "last_name": "Dos",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "last_login": null
+    }
+  },
+  {
+    "model": "auth.user",
+    "pk": 1004,
+    "fields": {
+      "username": "alumno3",
+      "password": "pbkdf2_sha256$260000$YHr4Z4t3dL92JwB5$vfB0Spx3Jaq8VkB1u2Xw==",
+      "email": "alumno3@test.com",
+      "first_name": "Alumno",
+      "last_name": "Tres",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "last_login": null
+    }
+  },
+  {
+    "model": "auth.user",
+    "pk": 1005,
+    "fields": {
+      "username": "profesor",
+      "password": "pbkdf2_sha256$260000$YHr4Z4t3dL92JwB5$vfB0Spx3Jaq8VkB1u2Xw==",
+      "email": "profesor@test.com",
+      "first_name": "Profesor",
+      "last_name": "Test",
+      "is_active": true,
+      "is_staff": true,
+      "is_superuser": false,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "last_login": null
+    }
+  },
+  {
+    "model": "auth.user",
+    "pk": 1006,
+    "fields": {
+      "username": "admin_test",
+      "password": "pbkdf2_sha256$260000$YHr4Z4t3dL92JwB5$vfB0Spx3Jaq8VkB1u2Xw==",
+      "email": "admin@test.com",
+      "first_name": "Admin",
+      "last_name": "Test",
+      "is_active": true,
+      "is_staff": true,
+      "is_superuser": true,
+      "date_joined": "2024-01-01T00:00:00Z",
+      "last_login": null
+    }
+  }
+]

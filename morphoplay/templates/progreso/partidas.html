@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Mis Partidas - MorphoPlay{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2>🎮 Mis Partidas</h2>
+        <p class="text-secondary">Historial de todas tus partidas jugadas</p>
+    </div>
+</div>
+
+<!-- Estadísticas rápidas -->
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body text-center">
+                <h3>{{ total_partidas }}</h3>
+                <p class="text-secondary mb-0">Total Partidas</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body text-center">
+                <h3 class="text-success">{{ total_correctas }}</h3>
+                <p class="text-secondary mb-0">✅ Correctas</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body text-center">
+                <h3 class="text-danger">{{ total_incorrectas }}</h3>
+                <p class="text-secondary mb-0">❌ Incorrectas</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body text-center">
+                <h3>{{ porcentaje_aciertos }}%</h3>
+                <p class="text-secondary mb-0">🎯 Aciertos</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Lista de partidas -->
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">📋 Historial de Partidas</h5>
+        <a href="{% url 'progreso:crear_partida' %}" class="btn btn-sm btn-primary">
+            <i class="fas fa-plus"></i> Nueva Partida
+        </a>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Juego</th>
+                        <th>Estado</th>
+                        <th>Puntos</th>
+                        <th>Tiempo</th>
+                        <th>Fecha</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for partida in partidas %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>
+                            <a href="{% url 'juegos:detail' partida.juego.id %}" class="text-decoration-none">
+                                {{ partida.juego.titulo }}
+                            </a>
+                        </td>
+                        <td>
+                            {% if partida.correcto %}
+                            <span class="badge bg-success">✅ Correcto</span>
+                            {% else %}
+                            <span class="badge bg-danger">❌ Incorrecto</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ partida.puntuacion_obtenida }}</td>
+                        <td>{{ partida.tiempo_segundos }}s</td>
+                        <td>{{ partida.fecha|date:"d/m/Y H:i" }}</td>
+                        <td>
+                            <a href="{% url 'progreso:ver_partida' partida.id %}" class="btn btn-sm btn-outline-info">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center py-4">
+                            <i class="fas fa-gamepad fa-2x text-secondary mb-2"></i>
+                            <p class="text-secondary mb-0">No has jugado ninguna partida aún</p>
+                            <a href="{% url 'juegos:list' %}" class="btn btn-primary mt-2">
+                                <i class="fas fa-play"></i> Jugar ahora
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,137 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Mi Progreso - MorphoPlay{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2>📊 Mi Progreso</h2>
+        <p class="text-secondary">Seguimiento de tu avance en todos los juegos</p>
+    </div>
+</div>
+
+<!-- Resumen de progreso -->
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body text-center">
+                <h3>{{ completados }}/{{ total_juegos }}</h3>
+                <p class="text-secondary mb-0">✅ Completados</p>
+                <div class="progress mt-2">
+                    <div class="progress-bar" style="width: {{ porcentaje_total }}%;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body text-center">
+                <h3>{{ en_progreso }}</h3>
+                <p class="text-secondary mb-0">⏳ En Progreso</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body text-center">
+                <h3>{{ no_iniciados }}</h3>
+                <p class="text-secondary mb-0">📭 No Iniciados</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body text-center">
+                <h3>{{ porcentaje_total }}%</h3>
+                <p class="text-secondary mb-0">📈 Progreso Total</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Progreso por categoría -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">📊 Progreso por Categoría</h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    {% for cat in progreso_categoria %}
+                    <div class="col-md-4">
+                        <div class="d-flex justify-content-between">
+                            <span>{{ cat.categoria }}</span>
+                            <span>{{ cat.completados }}/{{ cat.total }}</span>
+                        </div>
+                        <div class="progress">
+                            <div class="progress-bar" style="width: {{ cat.porcentaje }}%;"></div>
+                        </div>
+                        <small class="text-secondary">{{ cat.porcentaje }}%</small>
+                    </div>
+                    {% empty %}
+                    <div class="col-12 text-center text-secondary">
+                        No hay datos de progreso por categoría
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Últimos juegos jugados -->
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0">🕐 Últimos Juegos Jugados</h5>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Juego</th>
+                        <th>Estado</th>
+                        <th>Intentos</th>
+                        <th>Puntuación</th>
+                        <th>Último Intento</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for prog in ultimos_juegos %}
+                    <tr>
+                        <td>{{ prog.juego.titulo }}</td>
+                        <td>
+                            {% if prog.completado %}
+                            <span class="badge bg-success">✅ Completado</span>
+                            {% else %}
+                            <span class="badge bg-warning">⏳ En progreso</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ prog.intentos }}</td>
+                        <td>{{ prog.puntuacion }}</td>
+                        <td>{{ prog.ultimo_intento|date:"d/m/Y H:i" }}</td>
+                        <td>
+                            <a href="{% url 'juegos:detail' prog.juego.id %}" class="btn btn-sm btn-primary">
+                                <i class="fas fa-play"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center py-4">
+                            <p class="text-secondary mb-0">Aún no has jugado ningún juego</p>
+                            <a href="{% url 'juegos:list' %}" class="btn btn-primary mt-2">
+                                <i class="fas fa-play"></i> Jugar ahora
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

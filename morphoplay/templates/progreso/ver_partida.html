@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Detalle Partida - MorphoPlay{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">🔍 Detalle de Partida</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Juego:</strong> {{ partida.juego.titulo }}</p>
+                        <p><strong>Categoría:</strong> {{ partida.juego.categoria.nombre }}</p>
+                        <p><strong>Nivel:</strong> {{ partida.juego.nivel.nombre }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Resultado:</strong>
+                            {% if partida.correcto %}
+                            <span class="badge bg-success">✅ Correcto</span>
+                            {% else %}
+                            <span class="badge bg-danger">❌ Incorrecto</span>
+                            {% endif %}
+                        </p>
+                        <p><strong>Puntuación:</strong> {{ partida.puntuacion_obtenida }}</p>
+                        <p><strong>Tiempo:</strong> {{ partida.tiempo_segundos }} segundos</p>
+                        <p><strong>Fecha:</strong> {{ partida.fecha|date:"d/m/Y H:i:s" }}</p>
+                    </div>
+                </div>
+                
+                {% if partida.juego.pregunta %}
+                <div class="alert alert-secondary">
+                    <strong>Pregunta:</strong> {{ partida.juego.pregunta }}
+                </div>
+                <div class="alert alert-info">
+                    <strong>Respuesta correcta:</strong> {{ partida.juego.respuesta_correcta }}
+                </div>
+                {% endif %}
+                
+                <div class="mt-3 d-flex gap-2">
+                    <a href="{% url 'juegos:detail' partida.juego.id %}" class="btn btn-primary">
+                        <i class="fas fa-redo"></i> Volver a jugar
+                    </a>
+                    <a href="{% url 'progreso:partidas' %}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Volver a partidas
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
