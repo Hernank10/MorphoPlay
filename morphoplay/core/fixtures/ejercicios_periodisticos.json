@@ -1,0 +1,59 @@
+[
+  {
+    "model": "core.juego",
+    "pk": 1001,
+    "fields": {
+      "titulo": "Técnica 1: Pirámide Invertida",
+      "descripcion": "Estructura periodística que coloca la información más importante al inicio",
+      "pregunta": "¿Qué parte de la noticia contiene la información más relevante?",
+      "categoria": 4,
+      "nivel": 3,
+      "tipo": "opcion",
+      "opcion1": "El titular",
+      "opcion2": "El lead (entrada)",
+      "opcion3": "El cuerpo de la noticia",
+      "opcion4": "El cierre",
+      "respuesta_correcta": "El lead (entrada)",
+      "puntos": 15,
+      "orden": 1
+    }
+  },
+  {
+    "model": "core.juego",
+    "pk": 1002,
+    "fields": {
+      "titulo": "Técnica 2: Lead Directo",
+      "descripcion": "Entrada de noticia que responde a las preguntas básicas",
+      "pregunta": "¿Qué pregunta NO responde el lead directo?",
+      "categoria": 4,
+      "nivel": 3,
+      "tipo": "opcion",
+      "opcion1": "¿Qué pasó?",
+      "opcion2": "¿Quién lo hizo?",
+      "opcion3": "¿Qué piensa el autor?",
+      "opcion4": "¿Cuándo ocurrió?",
+      "respuesta_correcta": "¿Qué piensa el autor?",
+      "puntos": 15,
+      "orden": 2
+    }
+  },
+  {
+    "model": "core.juego",
+    "pk": 1003,
+    "fields": {
+      "titulo": "Técnica 3: Lead de Resumen",
+      "descripcion": "Entrada que sintetiza lo más importante en una oración",
+      "pregunta": "¿Cuál es la característica principal del lead de resumen?",
+      "categoria": 4,
+      "nivel": 3,
+      "tipo": "opcion",
+      "opcion1": "Extensión detallada",
+      "opcion2": "Síntesis en una oración",
+      "opcion3": "Uso de citas textuales",
+      "opcion4": "Descripción del lugar",
+      "respuesta_correcta": "Síntesis en una oración",
+      "puntos": 15,
+      "orden": 3
+    }
+  }
+]
