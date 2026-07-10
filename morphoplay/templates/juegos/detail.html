@@ -1,0 +1,236 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ juego.titulo }} - MorphoPlay{% endblock %}
+
+{% block extra_css %}
+<style>
+    .opcion-btn {
+        transition: all 0.3s ease;
+        min-width: 150px;
+        padding: 12px 20px;
+        margin: 5px;
+        border-radius: 12px;
+        font-weight: 500;
+    }
+    .opcion-btn:hover {
+        transform: scale(1.05);
+    }
+    .opcion-btn.correct {
+        background: #28a745 !important;
+        color: white !important;
+        border-color: #28a745 !important;
+    }
+    .opcion-btn.incorrect {
+        background: #dc3545 !important;
+        color: white !important;
+        border-color: #dc3545 !important;
+    }
+    .opcion-btn.disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+    }
+    .game-container {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+    .puntuacion-animada {
+        animation: pulse 0.5s ease;
+    }
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.2); }
+        100% { transform: scale(1); }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="game-container">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'juegos:list' %}">Juegos</a></li>
+            <li class="breadcrumb-item active">{{ juego.titulo }}</li>
+        </ol>
+    </nav>
+
+    <div class="card">
+        <div class="card-header">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <span class="badge bg-primary me-2">{{ juego.categoria.nombre|default:"General" }}</span>
+                    <span class="badge bg-{% if juego.nivel.nombre == 'Básico' %}success{% elif juego.nivel.nombre == 'Intermedio' %}warning{% elif juego.nivel.nombre == 'Avanzado' %}danger{% else %}info{% endif %}">
+                        {{ juego.nivel.nombre|default:"Básico" }}
+                    </span>
+                </div>
+                <div>
+                    <span class="badge bg-info">{{ juego.puntos }} puntos</span>
+                    {% if user.is_authenticated and progreso.completado %}
+                    <span class="badge bg-success">✅ Completado</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <h4 class="card-title">{{ juego.titulo }}</h4>
+            <p class="card-text text-secondary">{{ juego.descripcion }}</p>
+            
+            {% if juego.pregunta %}
+            <div class="alert alert-secondary mt-3">
+                <strong>❓ Pregunta:</strong> {{ juego.pregunta }}
+            </div>
+            {% endif %}
+
+            <div id="interactionArea" class="mt-4">
+                {% if juego.tipo == 'opcion' %}
+                <div class="d-flex flex-wrap justify-content-center gap-2">
+                    {% for opcion in juego.get_opciones %}
+                        {% if opcion %}
+                        <button class="btn btn-outline-primary opcion-btn" 
+                                data-opt="{{ opcion }}" 
+                                data-correct="{{ juego.respuesta_correcta }}">
+                            {{ opcion }}
+                        </button>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+
+            <div id="resultContainer" class="mt-4 text-center" style="display: none;">
+                <div id="resultMessage" class="alert"></div>
+                <div id="resultDetails" class="mt-2"></div>
+            </div>
+
+            <div class="mt-4 d-flex justify-content-between">
+                <div>
+                    <span class="text-secondary">
+                        <i class="fas fa-star"></i> Puntos: {{ juego.puntos }}
+                    </span>
+                </div>
+                <div>
+                    <span class="text-secondary">
+                        <i class="fas fa-hashtag"></i> Juego #{{ juego.orden|default:juego.id }}
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    {% if anterior %}
+                    <a href="{% url 'juegos:detail' anterior.id %}" class="btn btn-outline-secondary btn-sm">
+                        <i class="fas fa-arrow-left"></i> Anterior
+                    </a>
+                    {% endif %}
+                </div>
+                <div>
+                    <span class="text-secondary small">{{ juego.orden|default:juego.id }}/{{ total_juegos }}</span>
+                </div>
+                <div>
+                    {% if siguiente %}
+                    <a href="{% url 'juegos:detail' siguiente.id %}" class="btn btn-outline-secondary btn-sm">
+                        Siguiente <i class="fas fa-arrow-right"></i>
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    const juegoId = {{ juego.id }};
+    let answered = false;
+    
+    // Opción múltiple
+    $('.opcion-btn').on('click', function() {
+        if (answered) return;
+        answered = true;
+        
+        const $btn = $(this);
+        const selected = $btn.data('opt');
+        const correct = $btn.data('correct');
+        const isCorrect = selected === correct;
+        
+        // Deshabilitar todos los botones
+        $('.opcion-btn').addClass('disabled').prop('disabled', true);
+        
+        // Marcar respuesta
+        if (isCorrect) {
+            $btn.removeClass('btn-outline-primary').addClass('btn-success correct');
+        } else {
+            $btn.removeClass('btn-outline-primary').addClass('btn-danger incorrect');
+            // Mostrar la respuesta correcta
+            $('.opcion-btn').each(function() {
+                if ($(this).data('opt') === correct) {
+                    $(this).removeClass('btn-outline-primary').addClass('btn-success correct');
+                }
+            });
+        }
+        
+        // Enviar respuesta al servidor
+        $.ajax({
+            url: "{% url 'juegos:verificar' %}",
+            method: 'POST',
+            data: JSON.stringify({
+                juego_id: juegoId,
+                respuesta: selected
+            }),
+            contentType: 'application/json',
+            headers: {
+                'X-CSRFToken': $('meta[name="csrf-token"]').attr('content')
+            },
+            success: function(data) {
+                showResult(data);
+            },
+            error: function() {
+                showResult({
+                    correcto: isCorrect,
+                    puntos: isCorrect ? {{ juego.puntos }} : 0,
+                    respuesta_correcta: correct,
+                    mensaje: isCorrect ? '🎉 ¡Correcto!' : '❌ Incorrecto'
+                });
+            }
+        });
+    });
+    
+    function showResult(data) {
+        const container = $('#resultContainer');
+        const message = $('#resultMessage');
+        const details = $('#resultDetails');
+        
+        container.show();
+        
+        if (data.correcto) {
+            message.removeClass('alert-danger').addClass('alert-success');
+            message.html(`<i class="fas fa-check-circle"></i> ${data.mensaje}`);
+            details.html(`
+                <div class="puntuacion-animada">
+                    <span class="badge bg-success fs-5 p-3">
+                        <i class="fas fa-star"></i> +${data.puntos} puntos
+                    </span>
+                </div>
+            `);
+        } else {
+            message.removeClass('alert-success').addClass('alert-danger');
+            message.html(`<i class="fas fa-times-circle"></i> ${data.mensaje}`);
+            details.html(`
+                <div>
+                    <p class="text-secondary">Respuesta correcta:</p>
+                    <span class="badge bg-success fs-6 p-2">${data.respuesta_correcta}</span>
+                </div>
+            `);
+        }
+        
+        // Actualizar estadísticas en la página
+        if (data.completado) {
+            $('.badge.bg-success').text('✅ Completado');
+        }
+    }
+});
+</script>
+{% endblock %}

@@ -32,11 +32,10 @@ def home(request):
     
     if request.user.is_authenticated:
         try:
-            stats = request.user.estadisticas
+            stats, created = EstadisticasUsuario.objects.get_or_create(usuario=request.user)
             context['stats'] = stats
-        except EstadisticasUsuario.DoesNotExist:
-            stats = EstadisticasUsuario.objects.create(usuario=request.user)
-            context['stats'] = stats
+        except Exception as e:
+            context['stats'] = None
         
         ultimas_partidas = Partida.objects.filter(usuario=request.user).order_by('-fecha')[:5]
         context['ultimas_partidas'] = ultimas_partidas
@@ -72,7 +71,8 @@ def register(request):
             password=password
         )
         
-        EstadisticasUsuario.objects.create(usuario=user)
+        # Crear estadísticas iniciales
+        EstadisticasUsuario.objects.get_or_create(usuario=user)
         
         messages.success(request, 'Registro exitoso. ¡Bienvenido!')
         login(request, user)
@@ -110,9 +110,13 @@ def logout_view(request):
 @login_required
 def profile(request):
     """Perfil del usuario"""
+    try:
+        stats = request.user.estadisticas
+    except:
+        stats = None
     return render(request, 'accounts/profile.html', {
         'user': request.user,
-        'estadisticas': request.user.estadisticas,
+        'estadisticas': stats,
     })
 
 @login_required
@@ -157,6 +161,10 @@ def change_password(request):
     
     return render(request, 'accounts/change_password.html')
 
+# =============================================
+# VISTAS DEL DASHBOARD
+# =============================================
+
 @login_required
 def dashboard(request):
     """Dashboard del usuario"""
@@ -164,7 +172,7 @@ def dashboard(request):
     
     try:
         estadisticas = usuario.estadisticas
-    except EstadisticasUsuario.DoesNotExist:
+    except:
         estadisticas = EstadisticasUsuario.objects.create(usuario=usuario)
     
     ultimas_partidas = Partida.objects.filter(usuario=usuario).order_by('-fecha')[:10]

@@ -1,0 +1,265 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}MorphoPlay - Aprende lingüística jugando{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section text-center py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="hero-icon mb-3">
+                    <i class="fas fa-rocket" style="font-size: 4rem; color: #a78bfa;"></i>
+                </div>
+                <h1 class="display-3 fw-bold" style="background: linear-gradient(135deg, #a78bfa, #7c3aed); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                    MorphoPlay
+                </h1>
+                <p class="lead text-secondary">Aprende lingüística jugando con cursos, juegos y certificaciones</p>
+                
+                {% if user.is_authenticated %}
+                <div class="mt-4">
+                    <a href="{% url 'dashboard:index' %}" class="btn btn-primary btn-lg me-2">
+                        <i class="fas fa-chart-line"></i> Dashboard
+                    </a>
+                    <a href="{% url 'juegos:list' %}" class="btn btn-outline-primary btn-lg">
+                        <i class="fas fa-gamepad"></i> Jugar
+                    </a>
+                </div>
+                {% else %}
+                <div class="mt-4">
+                    <a href="{% url 'accounts:register' %}" class="btn btn-primary btn-lg me-2">
+                        <i class="fas fa-user-plus"></i> Registrarse
+                    </a>
+                    <a href="{% url 'accounts:login' %}" class="btn btn-outline-primary btn-lg">
+                        <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Estadísticas Rápidas -->
+<section class="stats-section mb-5">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-md-3 col-6">
+                <div class="card text-center h-100">
+                    <div class="card-body">
+                        <div class="display-4 text-primary">{{ total_juegos|default:"0" }}</div>
+                        <p class="text-secondary mb-0">🎮 Juegos</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="card text-center h-100">
+                    <div class="card-body">
+                        <div class="display-4 text-success">{{ total_cursos|default:"0" }}</div>
+                        <p class="text-secondary mb-0">📚 Cursos</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="card text-center h-100">
+                    <div class="card-body">
+                        <div class="display-4 text-warning">{{ total_categorias|default:"0" }}</div>
+                        <p class="text-secondary mb-0">📂 Categorías</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="card text-center h-100">
+                    <div class="card-body">
+                        <div class="display-4 text-info">🏆</div>
+                        <p class="text-secondary mb-0">Certificados</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Categorías Rápidas -->
+<section class="categories-section mb-5">
+    <div class="container">
+        <h3 class="mb-4">📂 Categorías</h3>
+        <div class="row g-3">
+            {% for cat in categorias %}
+            <div class="col-md-2 col-4">
+                <a href="/juegos/?categoria={{ cat.id }}" class="text-decoration-none">
+                    <div class="card text-center h-100">
+                        <div class="card-body">
+                            <div style="font-size: 2rem;">
+                                <i class="fas {{ cat.icono|default:'fa-tag' }}"></i>
+                            </div>
+                            <p class="small mb-0">{{ cat.nombre }}</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Juegos Destacados -->
+<section class="games-section mb-5">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h3>🎮 Juegos Destacados</h3>
+            <a href="{% url 'juegos:list' %}" class="btn btn-sm btn-outline-primary">
+                Ver todos <i class="fas fa-arrow-right"></i>
+            </a>
+        </div>
+        <div class="row g-4">
+            {% for juego in juegos_destacados %}
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <span class="badge bg-primary">{{ juego.categoria.nombre|default:"General" }}</span>
+                            <span class="badge bg-{% if juego.nivel.nombre == 'Básico' %}success{% elif juego.nivel.nombre == 'Intermedio' %}warning{% elif juego.nivel.nombre == 'Avanzado' %}danger{% else %}info{% endif %}">
+                                {{ juego.nivel.nombre|default:"Básico" }}
+                            </span>
+                        </div>
+                        <h5 class="card-title mt-2">{{ juego.titulo }}</h5>
+                        <p class="card-text text-secondary small">{{ juego.descripcion|truncatechars:60 }}</p>
+                        <div class="d-flex justify-content-between align-items-center mt-2">
+                            <span class="badge bg-info">{{ juego.puntos }} pts</span>
+                            <a href="{% url 'juegos:detail' juego.id %}" class="btn btn-sm btn-primary">
+                                <i class="fas fa-play"></i> Jugar
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12 text-center text-secondary">
+                <p>No hay juegos disponibles aún</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Cursos Destacados -->
+<section class="courses-section mb-5">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h3>📚 Cursos Destacados</h3>
+            <a href="{% url 'cursos:list' %}" class="btn btn-sm btn-outline-primary">
+                Ver todos <i class="fas fa-arrow-right"></i>
+            </a>
+        </div>
+        <div class="row g-4">
+            {% for curso in cursos_destacados %}
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <span class="badge bg-primary">{{ curso.categoria.nombre|default:"General" }}</span>
+                            <span class="badge bg-info">{{ curso.nivel.nombre|default:"Básico" }}</span>
+                        </div>
+                        <h5 class="card-title mt-2">{{ curso.titulo }}</h5>
+                        <p class="card-text text-secondary small">{{ curso.descripcion|truncatechars:80 }}</p>
+                        <div class="d-flex justify-content-between align-items-center mt-2">
+                            <span class="badge bg-secondary">📖 {{ curso.get_lecciones.count }} lecciones</span>
+                            <a href="{% url 'cursos:detail' curso.id %}" class="btn btn-sm btn-success">
+                                <i class="fas fa-eye"></i> Ver
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12 text-center text-secondary">
+                <p>No hay cursos disponibles aún</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Stats Usuario (si está autenticado) -->
+{% if user.is_authenticated and stats %}
+<section class="user-stats-section mb-5">
+    <div class="container">
+        <div class="card">
+            <div class="card-body">
+                <h4>📊 Tu Progreso</h4>
+                <div class="row g-3 mt-2">
+                    <div class="col-md-3 col-6">
+                        <div class="text-center">
+                            <h5>{{ stats.juegos_completados }}</h5>
+                            <p class="text-secondary small mb-0">Juegos Completados</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <div class="text-center">
+                            <h5>{{ stats.puntuacion_total }}</h5>
+                            <p class="text-secondary small mb-0">Puntuación Total</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <div class="text-center">
+                            <h5>🔥 {{ stats.racha_actual }}</h5>
+                            <p class="text-secondary small mb-0">Racha Actual</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <div class="text-center">
+                            <h5>🏆 {{ stats.racha_maxima }}</h5>
+                            <p class="text-secondary small mb-0">Mejor Racha</p>
+                        </div>
+                    </div>
+                </div>
+                
+                {% if ultimas_partidas %}
+                <div class="mt-3">
+                    <h6>🕐 Últimas partidas</h6>
+                    <div class="list-group">
+                        {% for partida in ultimas_partidas %}
+                        <div class="list-group-item bg-transparent border-secondary d-flex justify-content-between align-items-center">
+                            <span>{{ partida.juego.titulo }}</span>
+                            <span>
+                                {% if partida.correcto %}
+                                <span class="badge bg-success">✅ Correcto</span>
+                                {% else %}
+                                <span class="badge bg-danger">❌ Incorrecto</span>
+                                {% endif %}
+                                <span class="badge bg-info">{{ partida.puntuacion_obtenida }} pts</span>
+                            </span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Call to Action -->
+<section class="cta-section py-4">
+    <div class="container">
+        <div class="card bg-primary bg-gradient">
+            <div class="card-body text-center text-white p-5">
+                <h3>🚀 ¿Listo para aprender?</h3>
+                <p class="mb-3">Empieza ahora con nuestros juegos y cursos interactivos</p>
+                {% if user.is_authenticated %}
+                <a href="{% url 'juegos:list' %}" class="btn btn-light btn-lg">
+                    <i class="fas fa-play"></i> Jugar ahora
+                </a>
+                {% else %}
+                <a href="{% url 'accounts:register' %}" class="btn btn-light btn-lg">
+                    <i class="fas fa-user-plus"></i> Registrarse gratis
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
