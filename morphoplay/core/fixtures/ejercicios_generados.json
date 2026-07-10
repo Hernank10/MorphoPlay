@@ -1,0 +1,112 @@
+[
+  {
+    "model": "core.juego",
+    "pk": 2002,
+    "fields": {
+      "titulo": "Ejercicio 2002 - Morfologia",
+      "descripcion": "Ejercicio de opcion_multiple sobre morfologia",
+      "pregunta": "¿Qué es un lexema?",
+      "categoria": 4,
+      "nivel": 3,
+      "tipo": "opcion",
+      "opcion1": "Morfema",
+      "opcion2": "Prefijo",
+      "opcion3": "Significado básico",
+      "opcion4": "Sufijo",
+      "respuesta_correcta": "Significado básico",
+      "puntos": 10,
+      "orden": 3,
+      "activo": true,
+      "created_at": "2026-07-10T16:58:42.464101",
+      "updated_at": "2026-07-10T16:58:42.464101"
+    }
+  },
+  {
+    "model": "core.juego",
+    "pk": 2004,
+    "fields": {
+      "titulo": "Ejercicio 2004 - Verdadero/Falso",
+      "descripcion": "Ejercicio de morfologia",
+      "pregunta": "Los prefijos se añaden al final de la palabra",
+      "categoria": 4,
+      "nivel": 2,
+      "tipo": "opcion",
+      "opcion1": "Verdadero",
+      "opcion2": "Falso",
+      "opcion3": "",
+      "opcion4": "",
+      "respuesta_correcta": "Falso",
+      "puntos": 10,
+      "orden": 5,
+      "activo": true,
+      "created_at": "2026-07-10T16:58:42.464101",
+      "updated_at": "2026-07-10T16:58:42.464101"
+    }
+  },
+  {
+    "model": "core.juego",
+    "pk": 2006,
+    "fields": {
+      "titulo": "Ejercicio 2006 - Morfologia",
+      "descripcion": "Ejercicio de opcion_multiple sobre morfologia",
+      "pregunta": "¿Qué es un morfema?",
+      "categoria": 4,
+      "nivel": 3,
+      "tipo": "opcion",
+      "opcion1": "Sufijo",
+      "opcion2": "Prefijo",
+      "opcion3": "Parte gramatical",
+      "opcion4": "Raíz",
+      "respuesta_correcta": "Parte gramatical",
+      "puntos": 10,
+      "orden": 7,
+      "activo": true,
+      "created_at": "2026-07-10T16:58:42.464101",
+      "updated_at": "2026-07-10T16:58:42.464101"
+    }
+  },
+  {
+    "model": "core.juego",
+    "pk": 2010,
+    "fields": {
+      "titulo": "Ejercicio 2010 - Morfologia",
+      "descripcion": "Ejercicio de opcion_multiple sobre morfologia",
+      "pregunta": "¿Qué es un lexema?",
+      "categoria": 4,
+      "nivel": 3,
+      "tipo": "opcion",
+      "opcion1": "Prefijo",
+      "opcion2": "Sufijo",
+      "opcion3": "Morfema",
+      "opcion4": "Significado básico",
+      "respuesta_correcta": "Significado básico",
+      "puntos": 10,
+      "orden": 11,
+      "activo": true,
+      "created_at": "2026-07-10T16:58:42.464101",
+      "updated_at": "2026-07-10T16:58:42.464101"
+    }
+  },
+  {
+    "model": "core.juego",
+    "pk": 2014,
+    "fields": {
+      "titulo": "Ejercicio 2014 - Morfologia",
+      "descripcion": "Ejercicio de opcion_multiple sobre morfologia",
+      "pregunta": "¿Qué es un lexema?",
+      "categoria": 4,
+      "nivel": 3,
+      "tipo": "opcion",
+      "opcion1": "Sufijo",
+      "opcion2": "Significado básico",
+      "opcion3": "Morfema",
+      "opcion4": "Prefijo",
+      "respuesta_correcta": "Significado básico",
+      "puntos": 10,
+      "orden": 15,
+      "activo": true,
+      "created_at": "2026-07-10T16:58:42.464101",
+      "updated_at": "2026-07-10T16:58:42.464101"
+    }
+  }
+]
