@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ evaluacion.titulo }} - {{ curso.titulo }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'cursos:list' %}">Cursos</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'cursos:detail' curso.id %}">{{ curso.titulo }}</a></li>
+                <li class="breadcrumb-item active">{{ evaluacion.titulo }}</li>
+            </ol>
+        </nav>
+
+        <div class="card mb-4">
+            <div class="card-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0">{{ evaluacion.titulo }}</h4>
+                    <span class="badge bg-primary">{{ evaluacion.get_tipo_display }}</span>
+                </div>
+            </div>
+            <div class="card-body">
+                <p class="text-secondary">{{ evaluacion.descripcion }}</p>
+                <div class="d-flex gap-3 mb-3">
+                    <span class="badge bg-info">⏱ {{ evaluacion.tiempo_limite }} minutos</span>
+                    <span class="badge bg-warning text-dark">🎯 {{ evaluacion.puntaje_maximo }} puntos</span>
+                    <span class="badge bg-secondary">Intentos restantes: {{ intentos_restantes }}</span>
+                </div>
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i>
+                    <strong>Instrucciones:</strong> Responde todas las preguntas. Tienes {{ evaluacion.tiempo_limite }} minutos.
+                </div>
+            </div>
+        </div>
+
+        <form method="post" action="{% url 'cursos:submit_evaluacion' curso.id evaluacion.id %}" id="evaluacionForm">
+            {% csrf_token %}
+            
+            {% for pregunta in preguntas %}
+            <div class="card mb-3">
+                <div class="card-body">
+                    <h6 class="card-title">
+                        <span class="badge bg-secondary me-2">{{ forloop.counter }}</span>
+                        {{ pregunta.pregunta }}
+                        <span class="badge bg-info float-end">{{ pregunta.puntaje }} pts</span>
+                    </h6>
+                    
+                    <div class="mt-2">
+                        {% if pregunta.tipo == 'opcion' %}
+                            {% for opcion in pregunta.get_opciones %}
+                            {% if opcion %}
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" 
+                                       name="pregunta_{{ pregunta.id }}" 
+                                       id="pregunta_{{ pregunta.id }}_{{ forloop.counter }}"
+                                       value="{{ opcion }}">
+                                <label class="form-check-label" for="pregunta_{{ pregunta.id }}_{{ forloop.counter }}">
+                                    {{ opcion }}
+                                </label>
+                            </div>
+                            {% endif %}
+                            {% endfor %}
+                        {% elif pregunta.tipo == 'verdadero_falso' %}
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" 
+                                       name="pregunta_{{ pregunta.id }}" 
+                                       id="pregunta_{{ pregunta.id }}_verdadero"
+                                       value="Verdadero">
+                                <label class="form-check-label" for="pregunta_{{ pregunta.id }}_verdadero">Verdadero</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" 
+                                       name="pregunta_{{ pregunta.id }}" 
+                                       id="pregunta_{{ pregunta.id }}_falso"
+                                       value="Falso">
+                                <label class="form-check-label" for="pregunta_{{ pregunta.id }}_falso">Falso</label>
+                            </div>
+                        {% elif pregunta.tipo == 'texto' %}
+                            <textarea class="form-control" name="pregunta_{{ pregunta.id }}" 
+                                      rows="3" placeholder="Escribe tu respuesta..."></textarea>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <p class="text-secondary">No hay preguntas en esta evaluación.</p>
+            {% endfor %}
+
+            {% if preguntas %}
+            <div class="text-center">
+                <button type="submit" class="btn btn-success btn-lg">
+                    <i class="fas fa-paper-plane"></i> Enviar Evaluación
+                </button>
+                <a href="{% url 'cursos:detail' curso.id %}" class="btn btn-outline-secondary btn-lg">
+                    <i class="fas fa-times"></i> Cancelar
+                </a>
+            </div>
+            {% endif %}
+        </form>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('evaluacionForm');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            const radios = form.querySelectorAll('input[type="radio"]:checked');
+            const textareas = form.querySelectorAll('textarea');
+            let answered = radios.length;
+            textareas.forEach(function(t) {
+                if (t.value.trim()) answered++;
+            });
+            const total = form.querySelectorAll('input[type="radio"]').length / 2 + textareas.length;
+            
+            if (answered < total) {
+                e.preventDefault();
+                alert('Por favor, responde todas las preguntas antes de enviar.');
+            }
+        });
+    }
+});
+</script>
+{% endblock %}
