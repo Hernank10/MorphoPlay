@@ -30,12 +30,12 @@
                 </div>
                 <div class="alert alert-info">
                     <i class="fas fa-info-circle"></i>
-                    <strong>Instrucciones:</strong> Responde todas las preguntas. Tienes {{ evaluacion.tiempo_limite }} minutos.
+                    <strong>Instrucciones:</strong> Responde todas las preguntas.
                 </div>
             </div>
         </div>
 
-        <form method="post" action="/cursos/{{ curso.id }}/evaluacion/{{ evaluacion.id }}/submit/" id="evaluacionForm">
+        <form method="post" action="/cursos/{{ curso.id }}/evaluacion/{{ evaluacion.id }}/submit/">
             {% csrf_token %}
             
             {% for pregunta in preguntas %}
@@ -62,27 +62,6 @@
                             </div>
                             {% endif %}
                             {% endfor %}
-                        {% elif pregunta.tipo == 'verdadero_falso' %}
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" 
-                                       name="pregunta_{{ pregunta.id }}" 
-                                       id="pregunta_{{ pregunta.id }}_verdadero"
-                                       value="Verdadero">
-                                <label class="form-check-label" for="pregunta_{{ pregunta.id }}_verdadero">Verdadero</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" 
-                                       name="pregunta_{{ pregunta.id }}" 
-                                       id="pregunta_{{ pregunta.id }}_falso"
-                                       value="Falso">
-                                <label class="form-check-label" for="pregunta_{{ pregunta.id }}_falso">Falso</label>
-                            </div>
-                        {% elif pregunta.tipo == 'texto' %}
-                            <textarea class="form-control" name="pregunta_{{ pregunta.id }}" 
-                                      rows="3" placeholder="Escribe tu respuesta..."></textarea>
-                        {% elif pregunta.tipo == 'numerica' %}
-                            <input type="number" class="form-control" name="pregunta_{{ pregunta.id }}" 
-                                   placeholder="Escribe un número..." style="max-width: 200px;">
                         {% endif %}
                     </div>
                 </div>
@@ -94,7 +73,7 @@
             {% if preguntas %}
             <div class="text-center">
                 <button type="submit" class="btn btn-success btn-lg">
-                    <i class="fas fa-paper-plane"></i> Enviar Evaluación
+                    <i class="fas fa-paper-plane"></i> Enviar
                 </button>
                 <a href="/cursos/{{ curso.id }}/" class="btn btn-outline-secondary btn-lg">
                     <i class="fas fa-times"></i> Cancelar
@@ -104,30 +83,4 @@
         </form>
     </div>
 </div>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const form = document.getElementById('evaluacionForm');
-    if (form) {
-        form.addEventListener('submit', function(e) {
-            const radios = form.querySelectorAll('input[type="radio"]:checked');
-            const textareas = form.querySelectorAll('textarea');
-            const numericos = form.querySelectorAll('input[type="number"]');
-            let answered = radios.length;
-            textareas.forEach(function(t) {
-                if (t.value.trim()) answered++;
-            });
-            numericos.forEach(function(n) {
-                if (n.value.trim()) answered++;
-            });
-            const total = form.querySelectorAll('input[type="radio"]').length / 2 + textareas.length + numericos.length;
-            
-            if (answered < total) {
-                e.preventDefault();
-                alert('Por favor, responde todas las preguntas antes de enviar.');
-            }
-        });
-    }
-});
-</script>
 {% endblock %}

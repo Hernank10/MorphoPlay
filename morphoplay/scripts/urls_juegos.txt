@@ -1,0 +1,5 @@
+
+# URLs para juegos (agregar a morphoplay/urls.py)
+# path('juegos/', views.juegos_list, name='juegos_list'),
+# path('juegos/<int:juego_id>/', views.juego_detail, name='juego_detail'),
+# path('juegos/api/verificar/', views.verificar_respuesta, name='verificar_respuesta'),

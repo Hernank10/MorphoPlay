@@ -12,19 +12,34 @@
         margin: 5px;
         border-radius: 12px;
         font-weight: 500;
+        font-size: 1.1rem;
     }
     .opcion-btn:hover {
         transform: scale(1.05);
+        box-shadow: 0 5px 20px rgba(124, 58, 237, 0.2);
     }
     .opcion-btn.correct {
         background: #28a745 !important;
         color: white !important;
         border-color: #28a745 !important;
+        animation: correctAnim 0.5s ease;
     }
     .opcion-btn.incorrect {
         background: #dc3545 !important;
         color: white !important;
         border-color: #dc3545 !important;
+        animation: incorrectAnim 0.5s ease;
+    }
+    @keyframes correctAnim {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.2); }
+        100% { transform: scale(1); }
+    }
+    @keyframes incorrectAnim {
+        0% { transform: scale(1); }
+        25% { transform: translateX(-10px); }
+        75% { transform: translateX(10px); }
+        100% { transform: translateX(0); }
     }
     .opcion-btn.disabled {
         opacity: 0.7;
@@ -33,6 +48,17 @@
     .game-container {
         max-width: 800px;
         margin: 0 auto;
+    }
+    .puntuacion-animada {
+        animation: pulse 0.5s ease;
+    }
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.2); }
+        100% { transform: scale(1); }
+    }
+    .emoji-big {
+        font-size: 3rem;
     }
 </style>
 {% endblock %}
@@ -74,7 +100,6 @@
             {% endif %}
 
             <div id="interactionArea" class="mt-4">
-                {% if juego.tipo == 'opcion' %}
                 <div class="d-flex flex-wrap justify-content-center gap-2">
                     {% for opcion in juego.get_opciones %}
                         {% if opcion %}
@@ -86,12 +111,24 @@
                         {% endif %}
                     {% endfor %}
                 </div>
-                {% endif %}
             </div>
 
             <div id="resultContainer" class="mt-4 text-center" style="display: none;">
                 <div id="resultMessage" class="alert"></div>
                 <div id="resultDetails" class="mt-2"></div>
+            </div>
+
+            <div class="mt-4 d-flex justify-content-between">
+                <div>
+                    <span class="text-secondary">
+                        <i class="fas fa-star"></i> Puntos: {{ juego.puntos }}
+                    </span>
+                </div>
+                <div>
+                    <span class="text-secondary">
+                        <i class="fas fa-hashtag"></i> Juego #{{ juego.orden|default:juego.id }}
+                    </span>
+                </div>
             </div>
         </div>
         <div class="card-footer">

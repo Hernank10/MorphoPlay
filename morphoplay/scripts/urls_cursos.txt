@@ -1,0 +1,7 @@
+
+# URLs para cursos (agregar a morphoplay/urls.py)
+# path('cursos/', views.cursos_list, name='cursos_list'),
+# path('cursos/<int:curso_id>/', views.curso_detail, name='curso_detail'),
+# path('cursos/<int:curso_id>/leccion/<int:leccion_id>/', views.leccion_detail, name='leccion'),
+# path('cursos/<int:curso_id>/evaluacion/<int:evaluacion_id>/', views.evaluacion_detail, name='evaluacion'),
+# path('cursos/<int:curso_id>/evaluacion/<int:evaluacion_id>/submit/', views.submit_evaluacion, name='submit_evaluacion'),

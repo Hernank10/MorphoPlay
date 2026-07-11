@@ -306,3 +306,14 @@ class IntentoEvaluacion(models.Model):
         self.puntaje_obtenido = puntaje
         self.save()
         return puntaje
+
+# Modelo de Certificación
+class Certificacion(models.Model):
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE, related_name='certificaciones')
+    curso = models.ForeignKey('Curso', on_delete=models.CASCADE)
+    nivel = models.CharField(max_length=20, default='basico')
+    fecha_emision = models.DateTimeField(auto_now_add=True)
+    codigo = models.CharField(max_length=50, unique=True)
+    
+    def __str__(self):
+        return f"{self.usuario.username} - {self.curso.titulo}"

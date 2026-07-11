@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block title %}Certificaciones{% endblock %}
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2>🏆 Certificaciones</h2>
+        <p>Certificaciones obtenidas</p>
+    </div>
+</div>
+{% if certificaciones %}
+    {% for cert in certificaciones %}
+    <div class="card">
+        <div class="card-body">
+            <h5>{{ cert.curso.titulo }}</h5>
+            <p>Código: {{ cert.codigo }}</p>
+            <p>Fecha: {{ cert.fecha_emision|date:"d/m/Y" }}</p>
+        </div>
+    </div>
+    {% endfor %}
+{% else %}
+    <p>No tienes certificaciones</p>
+{% endif %}
+{% endblock %}

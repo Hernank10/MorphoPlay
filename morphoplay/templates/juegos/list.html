@@ -6,79 +6,11 @@
 {% block content %}
 <div class="row mb-4">
     <div class="col-12">
-        <h2>🎮 Todos los Juegos</h2>
-        <p class="text-secondary">Practica y aprende con nuestros juegos interactivos</p>
+        <h2>🎮 Juegos Interactivos</h2>
+        <p class="text-secondary">¡Aprende jugando con nuestros juegos lúdicos!</p>
     </div>
 </div>
 
-<!-- Filtros -->
-<div class="row mb-4">
-    <div class="col-12">
-        <div class="card">
-            <div class="card-body">
-                <form method="get" class="row g-3 align-items-end">
-                    <div class="col-md-4">
-                        <label class="form-label">Categoría</label>
-                        <select name="categoria" class="form-select">
-                            <option value="">Todas las categorías</option>
-                            {% for cat in categorias %}
-                            <option value="{{ cat.id }}" {% if categoria_seleccionada == cat.id %}selected{% endif %}>
-                                {{ cat.nombre }}
-                            </option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="col-md-4">
-                        <label class="form-label">Nivel</label>
-                        <select name="nivel" class="form-select">
-                            <option value="">Todos los niveles</option>
-                            {% for niv in niveles %}
-                            <option value="{{ niv.id }}" {% if nivel_seleccionado == niv.id %}selected{% endif %}>
-                                {{ niv.nombre }}
-                            </option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="col-md-4">
-                        <button type="submit" class="btn btn-primary w-100">
-                            <i class="fas fa-filter"></i> Filtrar
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Estadísticas rápidas -->
-<div class="row g-3 mb-4">
-    <div class="col-md-4">
-        <div class="card text-center">
-            <div class="card-body">
-                <h3>{{ total_juegos }}</h3>
-                <p class="text-secondary mb-0">🎮 Juegos Totales</p>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-4">
-        <div class="card text-center">
-            <div class="card-body">
-                <h3>{{ juegos_completados|default:0 }}</h3>
-                <p class="text-secondary mb-0">✅ Completados</p>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-4">
-        <div class="card text-center">
-            <div class="card-body">
-                <h3>{{ progreso_porcentaje|default:0 }}%</h3>
-                <p class="text-secondary mb-0">📊 Progreso</p>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Lista de juegos -->
 <div class="row g-4">
     {% for juego in juegos %}
     <div class="col-md-4 col-lg-3">
@@ -92,21 +24,6 @@
                 </div>
                 <h5 class="card-title mt-2">{{ juego.titulo }}</h5>
                 <p class="card-text text-secondary small">{{ juego.descripcion|truncatechars:60 }}</p>
-                
-                <!-- Estado del juego -->
-                {% if user.is_authenticated %}
-                    {% with progreso=juego.progreso_set.first %}
-                    <div class="mb-2">
-                        {% if progreso.completado %}
-                        <span class="badge bg-success">✅ Completado</span>
-                        {% else %}
-                        <span class="badge bg-warning text-dark">⏳ Pendiente</span>
-                        {% endif %}
-                        <span class="badge bg-secondary">{{ progreso.intentos|default:0 }} intentos</span>
-                    </div>
-                    {% endwith %}
-                {% endif %}
-                
                 <div class="d-flex justify-content-between align-items-center mt-2">
                     <span class="badge bg-info">{{ juego.puntos }} pts</span>
                     <a href="/juegos/{{ juego.id }}/" class="btn btn-sm btn-primary">
@@ -120,44 +37,7 @@
     <div class="col-12 text-center py-5">
         <i class="fas fa-gamepad fa-3x text-secondary mb-3"></i>
         <h4>No hay juegos disponibles</h4>
-        <p class="text-secondary">Pronto agregaremos más juegos.</p>
-        {% if user.is_staff %}
-        <a href="/admin/core/juego/add/" class="btn btn-primary">
-            <i class="fas fa-plus"></i> Crear juego
-        </a>
-        {% endif %}
     </div>
     {% endfor %}
 </div>
-
-<!-- Paginación -->
-{% if juegos.has_other_pages %}
-<nav aria-label="Page navigation" class="mt-4">
-    <ul class="pagination justify-content-center">
-        {% if juegos.has_previous %}
-        <li class="page-item">
-            <a class="page-link" href="?page={{ juegos.previous_page_number }}{% if categoria_seleccionada %}&categoria={{ categoria_seleccionada }}{% endif %}{% if nivel_seleccionado %}&nivel={{ nivel_seleccionado }}{% endif %}">
-                Anterior
-            </a>
-        </li>
-        {% endif %}
-        
-        {% for num in juegos.paginator.page_range %}
-        <li class="page-item {% if juegos.number == num %}active{% endif %}">
-            <a class="page-link" href="?page={{ num }}{% if categoria_seleccionada %}&categoria={{ categoria_seleccionada }}{% endif %}{% if nivel_seleccionado %}&nivel={{ nivel_seleccionado }}{% endif %}">
-                {{ num }}
-            </a>
-        </li>
-        {% endfor %}
-        
-        {% if juegos.has_next %}
-        <li class="page-item">
-            <a class="page-link" href="?page={{ juegos.next_page_number }}{% if categoria_seleccionada %}&categoria={{ categoria_seleccionada }}{% endif %}{% if nivel_seleccionado %}&nivel={{ nivel_seleccionado }}{% endif %}">
-                Siguiente
-            </a>
-        </li>
-        {% endif %}
-    </ul>
-</nav>
-{% endif %}
 {% endblock %}

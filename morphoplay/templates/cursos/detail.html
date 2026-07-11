@@ -29,7 +29,6 @@
         </div>
 
         <div class="row">
-            <!-- Lecciones -->
             <div class="col-md-8">
                 <h4>📖 Lecciones</h4>
                 <div class="list-group">
@@ -50,7 +49,6 @@
                 </div>
             </div>
 
-            <!-- Evaluaciones y Progreso -->
             <div class="col-md-4">
                 <h4>📝 Evaluaciones</h4>
                 <div class="list-group mb-3">
@@ -70,21 +68,15 @@
                     {% endfor %}
                 </div>
 
-                <!-- Progreso -->
                 <div class="card">
                     <div class="card-body">
                         <h5>📊 Progreso</h5>
-                        {% with total=lecciones_count %}
                         <div class="progress mb-2">
-                            <div class="progress-bar" style="width: {% widthratio progreso.lecciones_completadas total 100 %}%;"></div>
+                            <div class="progress-bar" style="width: {% widthratio progreso.lecciones_completadas lecciones_count 100 %}%;"></div>
                         </div>
                         <p class="text-secondary small">
-                            {{ progreso.lecciones_completadas }}/{{ total }} lecciones
-                            {% if evaluaciones_count %}
-                            • {{ progreso.evaluaciones_completadas }}/{{ evaluaciones_count }} evaluaciones
-                            {% endif %}
+                            {{ progreso.lecciones_completadas }}/{{ lecciones_count }} lecciones
                         </p>
-                        {% endwith %}
                         <span class="badge bg-{% if progreso.estado == 'completado' %}success{% elif progreso.estado == 'en_progreso' %}warning{% else %}secondary{% endif %}">
                             {{ progreso.get_estado_display|default:"No iniciado" }}
                         </span>
