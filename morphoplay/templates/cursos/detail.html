@@ -8,7 +8,7 @@
     <div class="col-12">
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="{% url 'cursos:list' %}">Cursos</a></li>
+                <li class="breadcrumb-item"><a href="/cursos/">Cursos</a></li>
                 <li class="breadcrumb-item active">{{ curso.titulo }}</li>
             </ol>
         </nav>
@@ -34,7 +34,7 @@
                 <h4>📖 Lecciones</h4>
                 <div class="list-group">
                     {% for leccion in lecciones %}
-                    <a href="{% url 'cursos:leccion' curso.id leccion.id %}" 
+                    <a href="/cursos/{{ curso.id }}/leccion/{{ leccion.id }}/" 
                        class="list-group-item list-group-item-action">
                         <div class="d-flex justify-content-between align-items-center">
                             <div>
@@ -55,7 +55,7 @@
                 <h4>📝 Evaluaciones</h4>
                 <div class="list-group mb-3">
                     {% for evaluacion in evaluaciones %}
-                    <a href="{% url 'cursos:evaluacion' curso.id evaluacion.id %}" 
+                    <a href="/cursos/{{ curso.id }}/evaluacion/{{ evaluacion.id }}/" 
                        class="list-group-item list-group-item-action">
                         <div class="d-flex justify-content-between align-items-center">
                             <div>

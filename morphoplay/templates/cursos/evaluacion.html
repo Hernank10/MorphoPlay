@@ -8,8 +8,8 @@
     <div class="col-12">
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="{% url 'cursos:list' %}">Cursos</a></li>
-                <li class="breadcrumb-item"><a href="{% url 'cursos:detail' curso.id %}">{{ curso.titulo }}</a></li>
+                <li class="breadcrumb-item"><a href="/cursos/">Cursos</a></li>
+                <li class="breadcrumb-item"><a href="/cursos/{{ curso.id }}/">{{ curso.titulo }}</a></li>
                 <li class="breadcrumb-item active">{{ evaluacion.titulo }}</li>
             </ol>
         </nav>
@@ -35,7 +35,7 @@
             </div>
         </div>
 
-        <form method="post" action="{% url 'cursos:submit_evaluacion' curso.id evaluacion.id %}" id="evaluacionForm">
+        <form method="post" action="/cursos/{{ curso.id }}/evaluacion/{{ evaluacion.id }}/submit/" id="evaluacionForm">
             {% csrf_token %}
             
             {% for pregunta in preguntas %}
@@ -80,6 +80,9 @@
                         {% elif pregunta.tipo == 'texto' %}
                             <textarea class="form-control" name="pregunta_{{ pregunta.id }}" 
                                       rows="3" placeholder="Escribe tu respuesta..."></textarea>
+                        {% elif pregunta.tipo == 'numerica' %}
+                            <input type="number" class="form-control" name="pregunta_{{ pregunta.id }}" 
+                                   placeholder="Escribe un número..." style="max-width: 200px;">
                         {% endif %}
                     </div>
                 </div>
@@ -93,7 +96,7 @@
                 <button type="submit" class="btn btn-success btn-lg">
                     <i class="fas fa-paper-plane"></i> Enviar Evaluación
                 </button>
-                <a href="{% url 'cursos:detail' curso.id %}" class="btn btn-outline-secondary btn-lg">
+                <a href="/cursos/{{ curso.id }}/" class="btn btn-outline-secondary btn-lg">
                     <i class="fas fa-times"></i> Cancelar
                 </a>
             </div>
@@ -109,11 +112,15 @@ document.addEventListener('DOMContentLoaded', function() {
         form.addEventListener('submit', function(e) {
             const radios = form.querySelectorAll('input[type="radio"]:checked');
             const textareas = form.querySelectorAll('textarea');
+            const numericos = form.querySelectorAll('input[type="number"]');
             let answered = radios.length;
             textareas.forEach(function(t) {
                 if (t.value.trim()) answered++;
             });
-            const total = form.querySelectorAll('input[type="radio"]').length / 2 + textareas.length;
+            numericos.forEach(function(n) {
+                if (n.value.trim()) answered++;
+            });
+            const total = form.querySelectorAll('input[type="radio"]').length / 2 + textareas.length + numericos.length;
             
             if (answered < total) {
                 e.preventDefault();

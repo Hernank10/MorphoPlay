@@ -29,7 +29,7 @@
                         <span class="badge bg-info">{{ curso.get_lecciones.count }} lecciones</span>
                         <span class="badge bg-secondary">⏱ {{ curso.duracion_estimada }}h</span>
                     </div>
-                    <a href="{% url 'cursos:detail' curso.id %}" class="btn btn-sm btn-primary">
+                    <a href="/cursos/{{ curso.id }}/" class="btn btn-sm btn-primary">
                         <i class="fas fa-eye"></i> Ver Curso
                     </a>
                 </div>

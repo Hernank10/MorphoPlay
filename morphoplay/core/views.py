@@ -3,16 +3,16 @@ from django.contrib.auth import login, authenticate, logout, update_session_auth
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib import messages
-from django.http import JsonResponse, HttpResponse
+from django.http import JsonResponse
 from django.db.models import Count, Sum, Avg, Q
 from django.utils import timezone
-from .models import (
-    Categoria, Nivel, Juego, Partida, Progreso, EstadisticasUsuario,
-    Curso, Leccion, Evaluacion, PreguntaEvaluacion, IntentoEvaluacion, ProgresoCurso
-)
+from .models import *
+
+# ============================================================
+# VISTAS PRINCIPALES
+# ============================================================
 
 def home(request):
-    """Página principal"""
     total_juegos = Juego.objects.filter(activo=True).count()
     total_cursos = Curso.objects.filter(activo=True).count()
     total_categorias = Categoria.objects.filter(activo=True).count()
@@ -32,20 +32,20 @@ def home(request):
     
     if request.user.is_authenticated:
         try:
-            stats, created = EstadisticasUsuario.objects.get_or_create(usuario=request.user)
+            stats = request.user.estadisticas
             context['stats'] = stats
-        except Exception as e:
-            context['stats'] = None
-        
-        ultimas_partidas = Partida.objects.filter(usuario=request.user).order_by('-fecha')[:5]
-        context['ultimas_partidas'] = ultimas_partidas
+        except:
+            pass
     
     return render(request, 'core/home.html', context)
 
+# ============================================================
+# VISTAS DE AUTENTICACIÓN
+# ============================================================
+
 def register(request):
-    """Registro de usuarios"""
     if request.user.is_authenticated:
-        return redirect('dashboard:dashboard')
+        return redirect('home')
     
     if request.method == 'POST':
         username = request.POST.get('username')
@@ -58,43 +58,31 @@ def register(request):
             return render(request, 'accounts/register.html')
         
         if User.objects.filter(username=username).exists():
-            messages.error(request, 'El nombre de usuario ya está en uso')
+            messages.error(request, 'El usuario ya existe')
             return render(request, 'accounts/register.html')
         
-        if User.objects.filter(email=email).exists():
-            messages.error(request, 'El correo electrónico ya está registrado')
-            return render(request, 'accounts/register.html')
+        user = User.objects.create_user(username, email, password)
+        EstadisticasUsuario.objects.create(usuario=user)
         
-        user = User.objects.create_user(
-            username=username,
-            email=email,
-            password=password
-        )
-        
-        # Crear estadísticas iniciales
-        EstadisticasUsuario.objects.get_or_create(usuario=user)
-        
-        messages.success(request, 'Registro exitoso. ¡Bienvenido!')
         login(request, user)
-        return redirect('dashboard:dashboard')
+        messages.success(request, '¡Registro exitoso! Bienvenido a MorphoPlay')
+        return redirect('home')
     
     return render(request, 'accounts/register.html')
 
 def login_view(request):
-    """Inicio de sesión"""
     if request.user.is_authenticated:
-        return redirect('dashboard:dashboard')
+        return redirect('home')
     
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
-        
         user = authenticate(request, username=username, password=password)
         
         if user is not None:
             login(request, user)
-            messages.success(request, f'¡Bienvenido de vuelta, {user.username}!')
-            return redirect('dashboard:dashboard')
+            messages.success(request, f'¡Bienvenido {user.username}!')
+            return redirect('home')
         else:
             messages.error(request, 'Credenciales inválidas')
     
@@ -102,40 +90,33 @@ def login_view(request):
 
 @login_required
 def logout_view(request):
-    """Cerrar sesión"""
     logout(request)
-    messages.info(request, 'Sesión cerrada exitosamente')
+    messages.info(request, 'Sesión cerrada correctamente')
     return redirect('home')
 
 @login_required
 def profile(request):
-    """Perfil del usuario"""
     try:
         stats = request.user.estadisticas
     except:
         stats = None
-    return render(request, 'accounts/profile.html', {
-        'user': request.user,
-        'estadisticas': stats,
-    })
+    return render(request, 'accounts/profile.html', {'estadisticas': stats})
 
 @login_required
 def edit_profile(request):
-    """Editar perfil"""
     if request.method == 'POST':
         user = request.user
         user.first_name = request.POST.get('first_name', '')
         user.last_name = request.POST.get('last_name', '')
         user.email = request.POST.get('email')
         user.save()
-        messages.success(request, 'Perfil actualizado exitosamente')
-        return redirect('accounts:profile')
+        messages.success(request, 'Perfil actualizado')
+        return redirect('profile')
     
     return render(request, 'accounts/edit_profile.html')
 
 @login_required
 def change_password(request):
-    """Cambiar contraseña"""
     if request.method == 'POST':
         old_password = request.POST.get('old_password')
         new_password = request.POST.get('new_password')
@@ -156,79 +137,51 @@ def change_password(request):
         request.user.set_password(new_password)
         request.user.save()
         update_session_auth_hash(request, request.user)
-        messages.success(request, 'Contraseña actualizada exitosamente')
-        return redirect('accounts:profile')
+        messages.success(request, 'Contraseña actualizada')
+        return redirect('profile')
     
     return render(request, 'accounts/change_password.html')
 
-# =============================================
-# VISTAS DEL DASHBOARD
-# =============================================
+# ============================================================
+# VISTAS DEL DASHBOARD - CORREGIDAS
+# ============================================================
 
-@login_required
 def dashboard(request):
-    """Dashboard del usuario"""
+    if not request.user.is_authenticated:
+        return redirect('login')
+    
     usuario = request.user
     
-    try:
-        estadisticas = usuario.estadisticas
-    except:
-        estadisticas = EstadisticasUsuario.objects.create(usuario=usuario)
+    # Usar get_or_create para evitar error de unicidad
+    estadisticas, created = EstadisticasUsuario.objects.get_or_create(
+        usuario=usuario,
+        defaults={
+            'juegos_completados': 0,
+            'puntuacion_total': 0,
+            'racha_actual': 0,
+            'racha_maxima': 0,
+            'tiempo_total': 0
+        }
+    )
     
     ultimas_partidas = Partida.objects.filter(usuario=usuario).order_by('-fecha')[:10]
-    progreso_cursos = ProgresoCurso.objects.filter(usuario=usuario).select_related('curso')
-    
-    total_juegos = Juego.objects.filter(activo=True).count()
-    juegos_completados_porcentaje = int((estadisticas.juegos_completados / max(1, total_juegos)) * 100)
     
     context = {
         'estadisticas': estadisticas,
         'ultimas_partidas': ultimas_partidas,
-        'progreso_cursos': progreso_cursos,
-        'total_juegos': total_juegos,
-        'juegos_completados_porcentaje': juegos_completados_porcentaje,
     }
-    
     return render(request, 'dashboard/dashboard.html', context)
 
-@login_required
-def dashboard_stats(request):
-    """Estadísticas del dashboard (API)"""
-    usuario = request.user
-    estadisticas = usuario.estadisticas
-    
-    progreso_categoria = []
-    for categoria in Categoria.objects.filter(activo=True):
-        juegos_categoria = Juego.objects.filter(categoria=categoria, activo=True)
-        completados = Progreso.objects.filter(
-            usuario=usuario,
-            juego__in=juegos_categoria,
-            completado=True
-        ).count()
-        progreso_categoria.append({
-            'categoria': categoria.nombre,
-            'total': juegos_categoria.count(),
-            'completados': completados,
-            'porcentaje': int((completados / max(1, juegos_categoria.count())) * 100)
-        })
-    
-    return JsonResponse({
-        'juegos_completados': estadisticas.juegos_completados,
-        'puntuacion_total': estadisticas.puntuacion_total,
-        'racha_actual': estadisticas.racha_actual,
-        'racha_maxima': estadisticas.racha_maxima,
-        'progreso_categoria': progreso_categoria,
-        'ultima_actividad': estadisticas.ultima_actividad.isoformat(),
-    })
+# ============================================================
+# VISTAS DE CURSOS
+# ============================================================
 
 def cursos_list(request):
-    """Lista de cursos"""
     cursos = Curso.objects.filter(activo=True).select_related('categoria', 'nivel')
     return render(request, 'cursos/list.html', {'cursos': cursos})
 
 @login_required
 def curso_detail(request, curso_id):
-    """Detalle de un curso"""
     curso = get_object_or_404(Curso, id=curso_id, activo=True)
     progreso, created = ProgresoCurso.objects.get_or_create(usuario=request.user, curso=curso)
     lecciones = curso.get_lecciones()
@@ -239,14 +192,11 @@ def curso_detail(request, curso_id):
         'progreso': progreso,
         'lecciones': lecciones,
         'evaluaciones': evaluaciones,
-        'lecciones_count': lecciones.count(),
-        'evaluaciones_count': evaluaciones.count(),
     }
     return render(request, 'cursos/detail.html', context)
 
 @login_required
 def leccion_detail(request, curso_id, leccion_id):
-    """Detalle de una lección"""
     curso = get_object_or_404(Curso, id=curso_id, activo=True)
     leccion = get_object_or_404(Leccion, id=leccion_id, curso=curso, activo=True)
     progreso, _ = ProgresoCurso.objects.get_or_create(usuario=request.user, curso=curso)
@@ -265,7 +215,6 @@ def leccion_detail(request, curso_id, leccion_id):
 
 @login_required
 def evaluacion_detail(request, curso_id, evaluacion_id):
-    """Detalle de una evaluación"""
     curso = get_object_or_404(Curso, id=curso_id, activo=True)
     evaluacion = get_object_or_404(Evaluacion, id=evaluacion_id, curso=curso, activo=True)
     
@@ -302,7 +251,6 @@ def evaluacion_detail(request, curso_id, evaluacion_id):
 
 @login_required
 def submit_evaluacion(request, curso_id, evaluacion_id):
-    """Enviar evaluación"""
     if request.method != 'POST':
         return redirect('cursos:detail', curso_id=curso_id)
     
@@ -325,127 +273,66 @@ def submit_evaluacion(request, curso_id, evaluacion_id):
     return redirect('cursos:detail', curso_id=curso_id)
 
 # ============================================================
-# VISTAS PARA EJERCICIOS PERIODÍSTICOS
+# VISTAS DE JUEGOS
 # ============================================================
 
-def ejercicios_periodisticos(request):
-    """Vista para mostrar los 100 ejercicios periodísticos"""
-    from .models import Juego
-    
-    # Obtener todos los ejercicios periodísticos (IDs 1001-1100)
-    ejercicios = Juego.objects.filter(id__gte=1001, id__lte=1100, activo=True).order_by('id')
-    
-    # Estadísticas
-    total_ejercicios = ejercicios.count()
-    completados = 0
-    puntuacion_total = 0
-    
-    if request.user.is_authenticated:
-        from .models import Progreso
-        progreso = Progreso.objects.filter(
-            usuario=request.user,
-            juego__in=ejercicios,
-            completado=True
-        )
-        completados = progreso.count()
-        puntuacion_total = progreso.aggregate(models.Sum('puntuacion'))['puntuacion__sum'] or 0
-    
-    # Agrupar por bloques de 10
-    bloques = []
-    for i in range(0, 100, 10):
-        bloque = ejercicios[i:i+10]
-        if bloque:
-            bloques.append({
-                'numero': i//10 + 1,
-                'rango': f"{i+1}-{min(i+10, 100)}",
-                'ejercicios': bloque
-            })
+def juegos_list(request):
+    juegos = Juego.objects.filter(activo=True).select_related('categoria', 'nivel')
+    categorias = Categoria.objects.filter(activo=True)
+    niveles = Nivel.objects.all()
     
     context = {
-        'ejercicios': ejercicios,
-        'bloques': bloques,
-        'total_ejercicios': total_ejercicios,
-        'completados': completados,
-        'puntuacion_total': puntuacion_total,
-        'porcentaje': int((completados / total_ejercicios) * 100) if total_ejercicios > 0 else 0,
+        'juegos': juegos,
+        'categorias': categorias,
+        'niveles': niveles,
     }
-    
-    return render(request, 'ejercicios/periodisticos.html', context)
+    return render(request, 'juegos/list.html', context)
 
 @login_required
-def ejercicio_periodistico_detail(request, ejercicio_id):
-    """Vista detallada de un ejercicio periodístico"""
-    from .models import Juego, Partida, Progreso, EstadisticasUsuario
-    
-    ejercicio = get_object_or_404(Juego, id=ejercicio_id, activo=True)
-    
-    # Verificar que es un ejercicio periodístico
-    if ejercicio_id < 1001 or ejercicio_id > 1100:
-        messages.warning(request, 'Este no es un ejercicio periodístico')
-        return redirect('ejercicios_periodisticos')
-    
-    # Obtener progreso del usuario
-    progreso = Progreso.objects.filter(usuario=request.user, juego=ejercicio).first()
-    
-    # Obtener siguiente y anterior
-    siguiente = Juego.objects.filter(id__gt=ejercicio_id, id__lte=1100, activo=True).order_by('id').first()
-    anterior = Juego.objects.filter(id__lt=ejercicio_id, id__gte=1001, activo=True).order_by('-id').first()
-    
-    # Obtener todas las partidas del usuario para este ejercicio
-    partidas = Partida.objects.filter(usuario=request.user, juego=ejercicio).order_by('-fecha')
+def juego_detail(request, juego_id):
+    juego = get_object_or_404(Juego, id=juego_id, activo=True)
+    progreso = Progreso.objects.filter(usuario=request.user, juego=juego).first()
     
     context = {
-        'ejercicio': ejercicio,
+        'juego': juego,
         'progreso': progreso,
-        'siguiente': siguiente,
-        'anterior': anterior,
-        'partidas': partidas,
-        'total_ejercicios': Juego.objects.filter(id__gte=1001, id__lte=1100, activo=True).count(),
-        'numero_ejercicio': ejercicio_id - 1000,
     }
-    
-    return render(request, 'ejercicios/detalle.html', context)
+    return render(request, 'juegos/detail.html', context)
 
 @login_required
-def verificar_ejercicio(request):
-    """Verificar respuesta de un ejercicio periodístico"""
+def verificar_respuesta(request):
     if request.method != 'POST':
         return JsonResponse({'error': 'Método no permitido'}, status=405)
     
     import json
     data = json.loads(request.body)
-    ejercicio_id = data.get('ejercicio_id')
+    juego_id = data.get('juego_id')
     respuesta = data.get('respuesta', '').strip()
     
-    from .models import Juego, Partida, Progreso, EstadisticasUsuario
-    from django.utils import timezone
+    juego = get_object_or_404(Juego, id=juego_id, activo=True)
+    es_correcto = respuesta.lower() == juego.respuesta_correcta.lower()
     
-    ejercicio = get_object_or_404(Juego, id=ejercicio_id, activo=True)
-    es_correcto = respuesta.lower() == ejercicio.respuesta_correcta.lower()
-    
-    # Registrar partida
     partida = Partida.objects.create(
         usuario=request.user,
-        juego=ejercicio,
+        juego=juego,
         correcto=es_correcto,
-        puntuacion_obtenida=ejercicio.puntos if es_correcto else 0,
+        puntuacion_obtenida=juego.puntos if es_correcto else 0,
     )
     
-    # Actualizar progreso
     progreso, created = Progreso.objects.get_or_create(
         usuario=request.user,
-        juego=ejercicio
+        juego=juego
     )
     progreso.intentos += 1
     
     if es_correcto and not progreso.completado:
         progreso.completado = True
-        progreso.puntuacion = ejercicio.puntos
+        progreso.puntuacion = juego.puntos
         progreso.fecha_completado = timezone.now()
         
         stats, _ = EstadisticasUsuario.objects.get_or_create(usuario=request.user)
         stats.juegos_completados += 1
-        stats.puntuacion_total += ejercicio.puntos
+        stats.puntuacion_total += juego.puntos
         stats.racha_actual += 1
         
         if stats.racha_actual > stats.racha_maxima:
@@ -461,9 +348,8 @@ def verificar_ejercicio(request):
     
     return JsonResponse({
         'correcto': es_correcto,
-        'puntos': ejercicio.puntos if es_correcto else 0,
-        'respuesta_correcta': ejercicio.respuesta_correcta,
+        'puntos': juego.puntos if es_correcto else 0,
+        'respuesta_correcta': juego.respuesta_correcta,
         'completado': progreso.completado,
-        'intentos': progreso.intentos,
         'mensaje': '🎉 ¡Correcto!' if es_correcto else '❌ Incorrecto. Intenta de nuevo.'
     })

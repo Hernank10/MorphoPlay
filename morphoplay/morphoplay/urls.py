@@ -1,19 +1,23 @@
 from django.contrib import admin
-from django.urls import path, include
-from django.conf import settings
-from django.conf.urls.static import static
-from core import views as core_views
+from django.urls import path
+from core import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', core_views.home, name='home'),
-    path('accounts/', include('core.urls_accounts')),
-    path('dashboard/', include('core.urls_dashboard')),
-    path('juegos/', include('core.urls_juegos')),
-    path('cursos/', include('core.urls_cursos')),
-    path('progreso/', include('core.urls_progreso')),
+    path('', views.home, name='home'),
+    path('accounts/register/', views.register, name='register'),
+    path('accounts/login/', views.login_view, name='login'),
+    path('accounts/logout/', views.logout_view, name='logout'),
+    path('accounts/profile/', views.profile, name='profile'),
+    path('accounts/profile/edit/', views.edit_profile, name='edit_profile'),
+    path('accounts/password/change/', views.change_password, name='change_password'),
+    path('dashboard/', views.dashboard, name='dashboard'),
+    path('cursos/', views.cursos_list, name='cursos_list'),
+    path('cursos/<int:curso_id>/', views.curso_detail, name='curso_detail'),
+    path('cursos/<int:curso_id>/leccion/<int:leccion_id>/', views.leccion_detail, name='leccion'),
+    path('cursos/<int:curso_id>/evaluacion/<int:evaluacion_id>/', views.evaluacion_detail, name='evaluacion'),
+    path('cursos/<int:curso_id>/evaluacion/<int:evaluacion_id>/submit/', views.submit_evaluacion, name='submit_evaluacion'),
+    path('juegos/', views.juegos_list, name='juegos_list'),
+    path('juegos/<int:juego_id>/', views.juego_detail, name='juego_detail'),
+    path('juegos/api/verificar/', views.verificar_respuesta, name='verificar_respuesta'),
 ]
-
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

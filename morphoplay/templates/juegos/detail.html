@@ -34,14 +34,6 @@
         max-width: 800px;
         margin: 0 auto;
     }
-    .puntuacion-animada {
-        animation: pulse 0.5s ease;
-    }
-    @keyframes pulse {
-        0% { transform: scale(1); }
-        50% { transform: scale(1.2); }
-        100% { transform: scale(1); }
-    }
 </style>
 {% endblock %}
 
@@ -49,7 +41,7 @@
 <div class="game-container">
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{% url 'juegos:list' %}">Juegos</a></li>
+            <li class="breadcrumb-item"><a href="/juegos/">Juegos</a></li>
             <li class="breadcrumb-item active">{{ juego.titulo }}</li>
         </ol>
     </nav>
@@ -101,25 +93,12 @@
                 <div id="resultMessage" class="alert"></div>
                 <div id="resultDetails" class="mt-2"></div>
             </div>
-
-            <div class="mt-4 d-flex justify-content-between">
-                <div>
-                    <span class="text-secondary">
-                        <i class="fas fa-star"></i> Puntos: {{ juego.puntos }}
-                    </span>
-                </div>
-                <div>
-                    <span class="text-secondary">
-                        <i class="fas fa-hashtag"></i> Juego #{{ juego.orden|default:juego.id }}
-                    </span>
-                </div>
-            </div>
         </div>
         <div class="card-footer">
             <div class="d-flex justify-content-between align-items-center">
                 <div>
                     {% if anterior %}
-                    <a href="{% url 'juegos:detail' anterior.id %}" class="btn btn-outline-secondary btn-sm">
+                    <a href="/juegos/{{ anterior.id }}/" class="btn btn-outline-secondary btn-sm">
                         <i class="fas fa-arrow-left"></i> Anterior
                     </a>
                     {% endif %}
@@ -129,7 +108,7 @@
                 </div>
                 <div>
                     {% if siguiente %}
-                    <a href="{% url 'juegos:detail' siguiente.id %}" class="btn btn-outline-secondary btn-sm">
+                    <a href="/juegos/{{ siguiente.id }}/" class="btn btn-outline-secondary btn-sm">
                         Siguiente <i class="fas fa-arrow-right"></i>
                     </a>
                     {% endif %}
@@ -146,7 +125,6 @@ $(document).ready(function() {
     const juegoId = {{ juego.id }};
     let answered = false;
     
-    // Opción múltiple
     $('.opcion-btn').on('click', function() {
         if (answered) return;
         answered = true;
@@ -156,15 +134,12 @@ $(document).ready(function() {
         const correct = $btn.data('correct');
         const isCorrect = selected === correct;
         
-        // Deshabilitar todos los botones
         $('.opcion-btn').addClass('disabled').prop('disabled', true);
         
-        // Marcar respuesta
         if (isCorrect) {
             $btn.removeClass('btn-outline-primary').addClass('btn-success correct');
         } else {
             $btn.removeClass('btn-outline-primary').addClass('btn-danger incorrect');
-            // Mostrar la respuesta correcta
             $('.opcion-btn').each(function() {
                 if ($(this).data('opt') === correct) {
                     $(this).removeClass('btn-outline-primary').addClass('btn-success correct');
@@ -172,9 +147,8 @@ $(document).ready(function() {
             });
         }
         
-        // Enviar respuesta al servidor
         $.ajax({
-            url: "{% url 'juegos:verificar' %}",
+            url: "/juegos/api/verificar/",
             method: 'POST',
             data: JSON.stringify({
                 juego_id: juegoId,
@@ -226,7 +200,6 @@ $(document).ready(function() {
             `);
         }
         
-        // Actualizar estadísticas en la página
         if (data.completado) {
             $('.badge.bg-success').text('✅ Completado');
         }

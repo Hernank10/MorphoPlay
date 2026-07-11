@@ -6,16 +6,14 @@
 {% block content %}
 <div class="row">
     <div class="col-12">
-        <!-- Breadcrumb -->
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="{% url 'cursos:list' %}">Cursos</a></li>
-                <li class="breadcrumb-item"><a href="{% url 'cursos:detail' curso.id %}">{{ curso.titulo }}</a></li>
+                <li class="breadcrumb-item"><a href="/cursos/">Cursos</a></li>
+                <li class="breadcrumb-item"><a href="/cursos/{{ curso.id }}/">{{ curso.titulo }}</a></li>
                 <li class="breadcrumb-item active">{{ leccion.titulo }}</li>
             </ol>
         </nav>
 
-        <!-- Encabezado de la lección -->
         <div class="card mb-4">
             <div class="card-header">
                 <div class="d-flex justify-content-between align-items-center">
@@ -31,11 +29,10 @@
             </div>
         </div>
 
-        <!-- Navegación entre lecciones -->
         <div class="d-flex justify-content-between align-items-center">
             <div>
                 {% if anterior %}
-                <a href="{% url 'cursos:leccion' curso.id anterior.id %}" class="btn btn-outline-primary">
+                <a href="/cursos/{{ curso.id }}/leccion/{{ anterior.id }}/" class="btn btn-outline-primary">
                     <i class="fas fa-arrow-left"></i> Lección anterior
                 </a>
                 {% else %}
@@ -51,18 +48,17 @@
             </div>
             <div>
                 {% if siguiente %}
-                <a href="{% url 'cursos:leccion' curso.id siguiente.id %}" class="btn btn-primary">
+                <a href="/cursos/{{ curso.id }}/leccion/{{ siguiente.id }}/" class="btn btn-primary">
                     Siguiente lección <i class="fas fa-arrow-right"></i>
                 </a>
                 {% else %}
-                <a href="{% url 'cursos:detail' curso.id %}" class="btn btn-success">
+                <a href="/cursos/{{ curso.id }}/" class="btn btn-success">
                     <i class="fas fa-check"></i> Completar curso
                 </a>
                 {% endif %}
             </div>
         </div>
 
-        <!-- Progreso del curso -->
         <div class="card mt-4">
             <div class="card-body">
                 <h6 class="mb-2">📊 Progreso del curso</h6>
