@@ -1,0 +1,48 @@
+# ============================================================
+# MORPHOPLAY - COMANDOS RÁPIDOS
+# ============================================================
+
+📦 GESTIÓN DEL PROYECTO
+------------------------------------------------------------
+source venv/bin/activate        # Activar entorno virtual
+deactivate                      # Desactivar entorno virtual
+python manage.py runserver      # Iniciar servidor
+mpr                             # Iniciar servidor (alias)
+
+🗄️ BASE DE DATOS
+------------------------------------------------------------
+python manage.py makemigrations # Crear migraciones
+python manage.py migrate        # Aplicar migraciones
+backup                          # Crear respaldo
+dbsize                          # Ver tamaño de BD
+
+👤 USUARIOS
+------------------------------------------------------------
+python manage.py createsuperuser # Crear superusuario
+python manage.py shell -c "from django.contrib.auth.models import User; print([u.username for u in User.objects.all()])"
+
+📊 SCRIPTS
+------------------------------------------------------------
+python scripts/cargar_juegos_cursos.py           # Cargar juegos y cursos
+python scripts/crear_lecciones_evaluaciones.py   # Crear lecciones
+python manage.py generar_ejercicios --cantidad 10 # Generar ejercicios
+python admin_morphoplay.py                       # Admin terminal
+
+📁 GIT
+------------------------------------------------------------
+gs                              # Ver estado
+ga                              # Agregar cambios
+gc "mensaje"                    # Crear commit
+gp                              # Subir a GitHub
+gl                              # Ver historial
+
+📚 CURSOS Y CONTENIDO
+------------------------------------------------------------
+python manage.py shell -c "from core.models import Curso; print([f'{c.id}: {c.titulo}' for c in Curso.objects.all()])"
+python manage.py shell -c "from core.models import Juego; print([f'{j.id}: {j.titulo}' for j in Juego.objects.all()])"
+python manage.py shell -c "from core.models import Evaluacion; print([f'{e.id}: {e.titulo}' for e in Evaluacion.objects.all()])"
+
+🏆 CERTIFICACIONES (nuevas)
+------------------------------------------------------------
+python manage.py shell -c "from core.models import Certificacion; print([f'{c.usuario.username}: {c.curso.titulo}' for c in Certificacion.objects.all()])"
+

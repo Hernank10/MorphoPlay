@@ -1,0 +1,38 @@
+# ============================================================
+# MORPHOPLAY - CONFIGURACIÓN DE TERMINAL
+# ============================================================
+
+# Colores personalizados
+export PS1='\[\e[0;32m\]\u\[\e[m\] \[\e[1;34m\]\w\[\e[m\] \[\e[1;32m\]$\[\e[m\] '
+
+# Alias para MorphoPlay
+alias mp="python manage.py"
+alias mpr="python manage.py runserver 0.0.0.0:8000"
+alias mps="python manage.py shell"
+alias mpm="python manage.py makemigrations"
+alias mpmig="python manage.py migrate"
+alias mpc="python manage.py createsuperuser"
+alias mpadmin="python admin_morphoplay.py"
+alias mpt="python terminal_morphoplay.py"
+
+# Comandos de git
+alias gs="git status"
+alias ga="git add ."
+alias gc="git commit -m"
+alias gp="git push origin main"
+alias gl="git log --oneline -10"
+
+# Comandos de base de datos
+alias backup="cp db.sqlite3 db_backup_\$(date +%Y%m%d_%H%M%S).sqlite3"
+alias dbsize="ls -lh db.sqlite3"
+alias dbclean="rm -f db.sqlite3 && python manage.py migrate"
+
+# Scripts útiles
+alias generate="python manage.py generar_ejercicios"
+alias loaddata="python scripts/recargar_datos_completos.py"
+alias lessons="python scripts/crear_lecciones_evaluaciones.py"
+
+# Información del proyecto
+alias info="echo '📊 MORPHOPLAY STATUS' && echo '📁 Dir: $(pwd)' && echo '🔄 Branch: $(git branch --show-current)' && echo '📝 Commits: $(git log --oneline | wc -l)' && echo '💾 DB Size: $(ls -lh db.sqlite3 | awk "{print \$5}")'"
+
+echo "✅ Terminal configurada para MorphoPlay"
